@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rsto/models/food_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -8,6 +9,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController nameController = TextEditingController();
+  String name = "";
+  List<String> foods = ["burger", "pizza", "pasta", "sushi", "steak", "salad"];
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,6 +35,115 @@ class _HomeScreenState extends State<HomeScreen> {
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
                 ),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(name),
+                      IconButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Edit Name"),
+                                content: TextField(
+                                  controller: nameController,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Name',
+                                  ),
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("Cancel"),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        name = nameController.text;
+                                      });
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text("Save"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        icon: Icon(Icons.edit),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 60,
+                    width: double.infinity,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = index;
+                            });
+                          },
+                          child: Container(
+                            child: Text(foods[index]),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: selectedIndex == index
+                                  ? Colors.grey
+                                  : Colors.deepOrangeAccent,
+                            ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return SizedBox(width: 10);
+                      },
+                      itemCount: foods.length,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 0.7,
+                      ),
+                      itemCount: foodDetails[selectedIndex].length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            children: [
+                              Image.network(
+                                foodDetails[selectedIndex][index].imgUrl,
+                                fit: BoxFit.cover,
+                                height: 100,
+                                width: 100,
+                              ),
+                              Text(foodDetails[selectedIndex][index].name),
+                              Text(foodDetails[selectedIndex][index].price),
+                              Text(foodDetails[selectedIndex][index].weight),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
